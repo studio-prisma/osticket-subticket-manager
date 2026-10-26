@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing yet
 
 ### Changed
-- Nothing yet
+- `plugin.php` `url` points at this fork. osTicket's *Plugin Update Check* resolves the repository from that field and compares the installed version with the latest GitHub release there; with the upstream URL (latest release v2.0.3) an installation of this fork never saw its own releases.
 
 ### Deprecated
 - Nothing yet
