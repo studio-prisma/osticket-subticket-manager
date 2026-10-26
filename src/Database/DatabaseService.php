@@ -92,11 +92,21 @@ final class DatabaseService
      */
     public function removeAll(): void
     {
+        $ticket = Table::name('ticket');
+
         db_query("DROP TABLE IF EXISTS `" . Table::name('ticket_progress') . "`");
         db_query("DROP TABLE IF EXISTS `" . Table::name('ticket_hierarchy_metadata') . "`");
-        db_query("ALTER TABLE `" . Table::name('ticket') . "` DROP COLUMN IF EXISTS `version`");
-        db_query("DROP INDEX IF EXISTS `idx_ticket_pid` ON `" . Table::name('ticket') . "`");
-        db_query("DROP INDEX IF EXISTS `idx_ticket_hierarchy` ON `" . Table::name('ticket') . "`");
+
+        // "DROP COLUMN IF EXISTS" and "DROP INDEX IF EXISTS" are MariaDB-only;
+        // MySQL needs the existence check in PHP.
+        if ($this->columnExists($ticket, 'version')) {
+            db_query("ALTER TABLE `$ticket` DROP COLUMN `version`");
+        }
+        foreach (['idx_ticket_pid', 'idx_ticket_hierarchy'] as $index) {
+            if ($this->indexExists($ticket, $index)) {
+                db_query("DROP INDEX `$index` ON `$ticket`");
+            }
+        }
     }
 
     /**
