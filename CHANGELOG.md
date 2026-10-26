@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Security
-- The hierarchy overview (`scp/subtickets.php`) listed up to 100 hierarchies with ticket number, subject and status across all departments to every agent; it only checked `isStaff()`. It now applies the rule of the ticket-view panel: children the agent cannot view are left out, parents the agent cannot view are shown without number, subject or link, and a parent with only hidden children does not appear. The rule lives in `SubticketManagerUIOverviewFilter`.
+- The hierarchy overview (`scp/subtickets.php`) listed up to 100 hierarchies with ticket number, subject and status across all departments to every agent; it only checked `isStaff()`. It now applies the rule of the ticket-view panel: children the agent cannot view are left out, parents the agent cannot view are shown without number, subject or link, and a parent with only hidden children does not appear. The rule lives in `src/UI/OverviewFilter.php`.
 
 ### Added
 - Nothing yet
