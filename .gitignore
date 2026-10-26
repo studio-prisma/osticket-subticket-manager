@@ -25,3 +25,8 @@ CLAUDE.md
 # git
 /.git-workflow*
 
+
+# Build output (tools/build-zip.sh) and local-only material
+/dist/
+/local/
+/private/
