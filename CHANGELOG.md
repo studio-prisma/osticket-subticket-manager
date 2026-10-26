@@ -42,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - AJAX action `create` and the matching JavaScript method. It bypassed `Ticket::open()` and therefore the agent's create permission and department; the UI never used it (new subtickets go through the regular new-ticket form).
 - Configuration options that nothing read: `auto_close_parent`, `cascade_hold`, `cascade_assignment`, `show_children_in_queue`, `notify_on_auto_close` (upstream issue #6). Auto-close is not implemented.
+- `scp/apps.php`. It was copied into osTicket's `scp/` directory on every enable but linked from nowhere (the admin overview is registered as `subtickets.php`). Uninstall still removes a copy left by an earlier version.
+- German strings in the otherwise English admin overview page.
 
 ### Fixed
 - All queries respect osTicket's configurable table prefix (`TABLE_PREFIX` in `ost-config.php`) through the new `Table::name()` helper. Installations with a prefix other than `ost_` got "Ticket not found" on every lookup, and `isCompatible()` reported a false negative (upstream PR #5, completed).
@@ -51,10 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `js/queue-indicator.js` used `arguments.callee` under `'use strict'`, which throws a `TypeError` whenever jQuery is not loaded yet, so the retry never ran.
 - `composer.json` declared MIT while `LICENSE`, the README and the code headers say GPL-2.0 (upstream issue #8). The manifest URL in `plugin.php` pointed to a repository that no longer exists; its description still said "(Phase 3)".
 - README: the link to a German version that never existed is gone, the feature list no longer claims an auto-close workflow, the configuration section lists the options that exist, and the troubleshooting entry about closed parents refers to `require_parent_open`.
-
-### Removed
-- `scp/apps.php`. It was copied into osTicket's `scp/` directory on every enable but linked from nowhere (the admin overview is registered as `subtickets.php`). Uninstall still removes a copy left by an earlier version.
-- German strings in the otherwise English admin overview page.
 
 ### Security
 - The `subticket_parent` hand-off from the ticket view to the new-ticket form could be set from any page, including the client portal, never expired, and was applied with a raw UPDATE without checking who the agent was or whether the parent was accessible. The candidate is now only accepted from `scp/tickets.php?a=open`, expires after 10 minutes, and is consumed only in a staff request by an agent who may link the parent, through the same checks as a manual link.
