@@ -20,10 +20,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing yet
 
 ### Fixed
-- Queue indicator loader is now inserted into `<head>` via an output buffer instead of being echoed during plugin bootstrap. The echo landed in front of `<!DOCTYPE html>`, which put the staff pages into quirks mode and positioned osTicket's dialogs (e.g. the due date editor) off-screen on long ticket pages. PJAX fragments keep receiving the loader at the top, as before.
+- Nothing yet
 
 ### Security
 - Nothing yet
+
+## [2.0.4] - 2026-10-26
+
+### Fixed
+- Queue indicator loader is now inserted into `<head>` via an output buffer instead of being echoed during plugin bootstrap. The echo landed in front of `<!DOCTYPE html>`, which put the staff pages into quirks mode and positioned osTicket's dialogs (e.g. the due date editor) off-screen on long ticket pages. PJAX fragments keep receiving the loader at the top, as before.
 
 ## [2.0.3] - 2026-05-26
 
@@ -88,4 +93,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add QueueColumnAnnotation mock for PHPUnit tests
 - Add missing Queue mock for PHPUnit tests
 
+[2.0.4]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.4
 [2.0.3]: https://github.com/markus-michalski/osticket-subticket-manager/releases/tag/v2.0.3
