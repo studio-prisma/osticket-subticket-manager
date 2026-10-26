@@ -27,14 +27,15 @@ final class PanelRenderer
      * Render the complete subticket panel
      *
      * @param int $ticketId Current ticket ID
-     * @param array|null $parent Parent ticket data
-     * @param array<int, array> $children Array of child tickets
+     * @param array|null $parent Parent ticket data; ['ticket_id' => n, 'restricted' => true] when the agent may not view it
+     * @param array<int, array> $children Child tickets the agent may view
      * @param string $csrfToken CSRF token for AJAX
+     * @param int $hiddenChildren Number of child tickets left out because the agent may not view them
      * @return string Complete HTML output
      */
-    public function render(int $ticketId, ?array $parent, array $children, string $csrfToken): string
+    public function render(int $ticketId, ?array $parent, array $children, string $csrfToken, int $hiddenChildren = 0): string
     {
-        $html = $this->renderPanel($ticketId, $parent, $children, $csrfToken);
+        $html = $this->renderPanel($ticketId, $parent, $children, $csrfToken, $hiddenChildren);
         $html .= $this->getCss();
         $html .= $this->getJavaScript();
 
@@ -44,20 +45,20 @@ final class PanelRenderer
     /**
      * Render the panel HTML structure
      */
-    private function renderPanel(int $ticketId, ?array $parent, array $children, string $csrfToken): string
+    private function renderPanel(int $ticketId, ?array $parent, array $children, string $csrfToken, int $hiddenChildren = 0): string
     {
         $html = '<div class="subticket-panel section-break" data-ticket-id="' . $ticketId . '" data-csrf-token="' . htmlspecialchars($csrfToken) . '">';
 
         // Parent ticket badge
-        if (!empty($children)) {
-            $html .= $this->renderParentBadge(count($children));
+        if (!empty($children) || $hiddenChildren > 0) {
+            $html .= $this->renderParentBadge(count($children) + $hiddenChildren);
         }
 
         // Parent section
         $html .= $this->renderParentSection($ticketId, $parent);
 
         // Children section
-        $html .= $this->renderChildrenSection($ticketId, $children);
+        $html .= $this->renderChildrenSection($ticketId, $children, $hiddenChildren);
 
         $html .= '</div>';
 
@@ -88,7 +89,10 @@ HTML;
         $html = '<div class="subticket-section parent-section">';
         $html .= '<h3>Parent Ticket</h3>';
 
-        if ($parent) {
+        if ($parent && !empty($parent['restricted'])) {
+            // The agent may not view the parent: no number, no subject, no link, no unlink.
+            $html .= '<p class="no-data">This ticket is linked to a parent ticket you cannot access.</p>';
+        } elseif ($parent) {
             $parentId = (int)$parent['ticket_id'];
             $number = htmlspecialchars($parent['number']);
             $subject = htmlspecialchars($parent['subject'] ?? '');
@@ -117,7 +121,7 @@ HTML;
     /**
      * Render the children section
      */
-    private function renderChildrenSection(int $ticketId, array $children): string
+    private function renderChildrenSection(int $ticketId, array $children, int $hiddenChildren = 0): string
     {
         $html = '<div class="subticket-section children-section">';
         $html .= '<h3>Child Tickets</h3>';
@@ -128,8 +132,13 @@ HTML;
                 $html .= $this->renderChildItem($ticketId, $child);
             }
             $html .= '</ul>';
-        } else {
+        } elseif ($hiddenChildren === 0) {
             $html .= '<p class="no-data">No child tickets</p>';
+        }
+
+        if ($hiddenChildren > 0) {
+            $plural = $hiddenChildren > 1 ? 's' : '';
+            $html .= '<p class="no-data">' . $hiddenChildren . ' child ticket' . $plural . ' not shown (no access)</p>';
         }
 
         $html .= '<button type="button" data-action="create-child" data-ticket-id="' . $ticketId . '" class="button button-primary subticket-action">Create Subticket</button>';
