@@ -57,7 +57,7 @@ include(STAFFINC_DIR . 'header.inc.php');
     <h1>Ticket Hierarchies</h1>
 
     <p style="margin-bottom: 20px; color: #666;">
-        Übersicht aller Parent-Child Ticket-Beziehungen im System.
+        Overview of all parent-child ticket relationships in the system.
     </p>
 
     <?php
@@ -121,18 +121,18 @@ include(STAFFINC_DIR . 'header.inc.php');
     <table class="list" border="0" cellspacing="1" cellpadding="2">
         <thead>
             <tr>
-                <th width="10%">Parent-Ticket</th>
-                <th width="20%">Betreff</th>
+                <th width="10%">Parent ticket</th>
+                <th width="20%">Subject</th>
                 <th width="10%">Status</th>
-                <th width="8%">Anzahl</th>
-                <th width="52%">Child-Tickets</th>
+                <th width="8%">Count</th>
+                <th width="52%">Child tickets</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($subtickets)): ?>
             <tr>
                 <td colspan="5" style="text-align: center; padding: 40px;">
-                    <em>Keine Ticket-Hierarchien gefunden.</em>
+                    <em>No ticket hierarchies found.</em>
                 </td>
             </tr>
             <?php else: ?>

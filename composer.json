@@ -2,7 +2,7 @@
     "name": "osticket/subticket-manager",
     "description": "Advanced subticket management plugin for osTicket",
     "type": "library",
-    "license": "MIT",
+    "license": "GPL-2.0-only",
     "require": {
         "php": ">=7.4.0"
     },

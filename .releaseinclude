@@ -27,7 +27,6 @@ vendor/autoload.php
 vendor/composer/
 
 # Admin & AJAX Pages (automatically deployed to scp/ on plugin enable)
-scp-files/apps.php
 scp-files/subtickets.php
 scp-files/ajax-subticket.php
 
