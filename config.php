@@ -97,6 +97,24 @@ class SubticketPluginConfig extends PluginConfig
     }
 
     /**
+     * Defaults of the numeric limits, used when a value is missing
+     *
+     * osTicket stores the instance that enable() creates through the same
+     * form as the admin page. That request carries no limit values, and a
+     * rejected form leaves the instance disabled, so an empty value means
+     * "the default", not "invalid".
+     *
+     * @return array<string, array{int, int, int}> key => [min, max, default]
+     */
+    public static function limits(): array
+    {
+        return [
+            'max_depth' => [1, 10, 3],
+            'max_children' => [1, 1000, 50],
+        ];
+    }
+
+    /**
      * Validate the numeric limits before osTicket stores them
      *
      * @param array $config Submitted values (by reference)
@@ -105,15 +123,15 @@ class SubticketPluginConfig extends PluginConfig
      */
     function pre_save(&$config, &$errors)
     {
-        $limits = [
-            'max_depth' => [1, 10],
-            'max_children' => [1, 1000],
-        ];
-
-        foreach ($limits as $key => [$min, $max]) {
+        foreach (self::limits() as $key => [$min, $max, $default]) {
             $raw = isset($config[$key]) ? trim((string)$config[$key]) : '';
 
-            if ($raw === '' || !ctype_digit($raw) || (int)$raw < $min || (int)$raw > $max) {
+            if ($raw === '') {
+                $config[$key] = (string)$default;
+                continue;
+            }
+
+            if (!ctype_digit($raw) || (int)$raw < $min || (int)$raw > $max) {
                 $errors[$key] = sprintf('Enter a whole number between %d and %d', $min, $max);
                 continue;
             }

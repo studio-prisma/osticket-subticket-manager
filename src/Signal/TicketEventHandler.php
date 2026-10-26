@@ -224,11 +224,22 @@ final class TicketEventHandler
 
     /**
      * Check if we should load queue indicator script
+     *
+     * Decided at bootstrap, before osTicket defines OSTSCPINC, so the
+     * request path is the only reliable signal: the queue pages live in
+     * scp/. The client portal has a tickets.php of its own, and the loader
+     * must not be injected there.
      */
     public function shouldLoadQueueIndicator(): bool
     {
-        $scriptName = basename($_SERVER['SCRIPT_NAME'] ?? '');
+        $script = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? ''));
+        $scriptName = basename($script);
         $queuePages = ['tickets.php', 'open.php', 'closed.php', 'answered.php', 'overdue.php', 'assigned.php'];
+
+        if (basename(dirname($script)) !== 'scp') {
+            $this->log('Skipping queue indicator', "Not a staff page (current: $script)");
+            return false;
+        }
 
         if (!in_array($scriptName, $queuePages, true)) {
             $this->log('Skipping queue indicator', "Not on queue page (current: $scriptName)");
