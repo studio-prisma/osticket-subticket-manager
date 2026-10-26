@@ -29,5 +29,10 @@
         "test:coverage": "phpunit --coverage-html coverage/html",
         "test:coverage-check": "phpunit --coverage-text --coverage-clover=coverage.xml && php -r \"if((int)shell_exec('grep -oP \\\"lines-covered=\\\\\\\"\\\\K[0-9]+\\\" coverage.xml')/(int)shell_exec('grep -oP \\\"lines-valid=\\\\\\\"\\\\K[0-9]+\\\" coverage.xml')*100 < 80) exit(1);\"",
         "analyse": "phpstan analyse src tests --level=8"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4.33"
+        }
     }
 }
