@@ -2,8 +2,9 @@
 /**
  * Subticket Manager - Overview Page
  *
- * Shows all parent-child ticket relationships in the system.
- * Available to all staff members for better ticket management.
+ * Shows the parent-child ticket relationships the current agent may see.
+ * Children the agent cannot view are left out, parents the agent cannot
+ * view are redacted - the same rule as the ticket-view panel.
  */
 
 require('staff.inc.php');
@@ -13,6 +14,16 @@ if (!$thisstaff || !$thisstaff->isStaff()) {
     Http::response(403, 'Access Denied');
     exit;
 }
+
+// Without the plugin's classes there is no access check: show nothing.
+if (!class_exists('\SubticketManager\UI\OverviewFilter')) {
+    Http::response(503, 'Subticket Manager is not loaded');
+    exit;
+}
+
+$overviewFilter = new \SubticketManager\UI\OverviewFilter(
+    new \SubticketManager\Security\TicketAccessGuard()
+);
 
 // Page title
 $nav->setTabActive('tickets');
@@ -78,19 +89,21 @@ include(STAFFINC_DIR . 'header.inc.php');
             LIMIT 100";
 
     $result = db_query($sql);
-    $subtickets = array();
+    $rows = array();
 
     while ($row = db_fetch_array($result)) {
-        $parentId = $row['ticket_pid'];
-        if (!isset($subtickets[$parentId])) {
-            $subtickets[$parentId] = array();
+        $rows[] = $row;
+    }
+
+    // Only children the agent may view, grouped by parent
+    $subtickets = $overviewFilter->visibleChildren($rows);
+
+    foreach ($subtickets as $parentId => $children) {
+        foreach ($children as $i => $row) {
+            // Use osTicket Ticket class to get subject
+            $ticket = Ticket::lookup($row['ticket_id']);
+            $subtickets[$parentId][$i]['subject'] = $ticket ? $ticket->getSubject() : 'Unknown';
         }
-
-        // Use osTicket Ticket class to get subject
-        $ticket = Ticket::lookup($row['ticket_id']);
-        $row['subject'] = $ticket ? $ticket->getSubject() : 'Unknown';
-
-        $subtickets[$parentId][] = $row;
     }
 
     // Get parent ticket info
@@ -99,6 +112,11 @@ include(STAFFINC_DIR . 'header.inc.php');
 
     if (!empty($parentIds)) {
         foreach ($parentIds as $parentId) {
+            if (!$overviewFilter->showParent((int)$parentId)) {
+                $parents[$parentId] = array('restricted' => true);
+                continue;
+            }
+
             $ticket = Ticket::lookup($parentId);
             if ($ticket) {
                 $parents[$parentId] = array(
@@ -140,13 +158,17 @@ include(STAFFINC_DIR . 'header.inc.php');
                 $parent = $parents[$parentId] ?? array('number' => 'Unknown', 'subject' => 'Unknown', 'status' => 'Unknown');
             ?>
             <tr>
+                <?php if (!empty($parent['restricted'])): ?>
+                <td colspan="3"><em>Parent ticket you cannot access</em></td>
+                <?php else: ?>
                 <td>
-                    <a href="tickets.php?id=<?php echo $parentId; ?>" target="_blank">
+                    <a href="tickets.php?id=<?php echo (int)$parentId; ?>" target="_blank">
                         #<?php echo Format::htmlchars($parent['number']); ?>
                     </a>
                 </td>
                 <td><?php echo Format::htmlchars($parent['subject']); ?></td>
                 <td><?php echo Format::htmlchars($parent['status']); ?></td>
+                <?php endif; ?>
                 <td style="text-align: center;"><strong><?php echo count($children); ?></strong></td>
                 <td>
                     <ul style="margin: 0; padding-left: 20px;">
