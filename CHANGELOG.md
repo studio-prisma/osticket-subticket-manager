@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Nothing yet
+
+### Changed
+- Nothing yet
+
+### Deprecated
+- Nothing yet
+
+### Removed
+- Nothing yet
+
+### Fixed
+- Nothing yet
+
+### Security
+- Nothing yet
+
+## [2.0.5] - 2026-10-26
+
+### Added
 - The hierarchy limits from the plugin configuration are now enforced when tickets are linked: `max_depth`, `max_children`, `require_parent_open` and `allow_nested_subtickets`. Values outside their range are rejected when the configuration is saved.
 - `TicketAccessGuard`: one place that answers "may this agent view / link this ticket", backed by osTicket's `Ticket::checkStaffPerm()` and the `ticket.link` role permission.
 
@@ -18,9 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The debug log (when `SUBTICKET_DEBUG` is on) is written to the system temp directory with mode 0600 and never through a symlink; `SUBTICKET_DEBUG_LOG` overrides the path.
 - AJAX errors return a generic message; the exception detail goes to the server error log only (`Throwable`, not just `Exception`).
 - CI workflow runs with `contents: read` permissions.
-
-### Deprecated
-- Nothing yet
 
 ### Removed
 - AJAX action `create` and the matching JavaScript method. It bypassed `Ticket::open()` and therefore the agent's create permission and department; the UI never used it (new subtickets go through the regular new-ticket form).
@@ -116,5 +133,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add QueueColumnAnnotation mock for PHPUnit tests
 - Add missing Queue mock for PHPUnit tests
 
+[2.0.5]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.5
 [2.0.4]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.4
 [2.0.3]: https://github.com/markus-michalski/osticket-subticket-manager/releases/tag/v2.0.3
