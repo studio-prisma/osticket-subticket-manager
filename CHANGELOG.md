@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Queue indicator loader is now inserted into `<head>` via an output buffer instead of being echoed during plugin bootstrap. The echo landed in front of `<!DOCTYPE html>`, which put the staff pages into quirks mode and positioned osTicket's dialogs (e.g. the due date editor) off-screen on long ticket pages. PJAX fragments keep receiving the loader at the top, as before.
+- All queries respect osTicket's configurable table prefix (`TABLE_PREFIX` in `ost-config.php`) through the new `Table::name()` helper. Installations with a prefix other than `ost_` got "Ticket not found" on every lookup, and `isCompatible()` reported a false negative (completes #5).
+- The foreign-key existence check is scoped to the current database schema and the constraint's own name.
+- `.releaseinclude` lists `src/Security/TicketAccessGuard.php` and `src/Database/Table.php`, so the release package contains them.
 
 ### Security
 - The `subticket_parent` hand-off from the ticket view to the new-ticket form could be set from any page, including the client portal, never expired, and was applied with a raw UPDATE without checking who the agent was or whether the parent was accessible. The candidate is now only accepted from `scp/tickets.php?a=open`, expires after 10 minutes, and is consumed only in a staff request by an agent who may link the parent, through the same checks as a manual link.
