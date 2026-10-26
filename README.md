@@ -1,121 +1,69 @@
 # Subticket Manager Plugin for osTicket
 
-> This is the [studio-prisma](https://github.com/studio-prisma) fork of [markus-michalski/osticket-subticket-manager](https://github.com/markus-michalski/osticket-subticket-manager). It carries the security and compatibility fixes listed in the [CHANGELOG](./CHANGELOG.md); the fixes are offered upstream as pull requests. Releases of this fork: [github.com/studio-prisma/osticket-subticket-manager/releases](https://github.com/studio-prisma/osticket-subticket-manager/releases).
+[![Validate](https://github.com/studio-prisma/osticket-subticket-manager/actions/workflows/validate.yml/badge.svg)](https://github.com/studio-prisma/osticket-subticket-manager/actions/workflows/validate.yml)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](LICENSE)
 
-> 📖 **[Complete Documentation & FAQ](https://faq.markus-michalski.net/en/osticket/subticket-manager)** (upstream) - Detailed guides, troubleshooting, API reference, and technical details
+Parent/child ticket links for osTicket 1.18: a panel in the staff ticket view to link and unlink tickets, a code-fork indicator in queue lists, and a hand-off from a parent ticket into the new-ticket form.
 
-## Overview
+**[Deutsche Fassung →](README.de.md)**
 
-The Subticket Manager plugin turns osTicket's hidden parent/child ticket infrastructure into a usable feature. osTicket provides the database structure (`ticket_pid` field) and API methods, but no user interface for them.
+> This is the [studio-prisma](https://github.com/studio-prisma) fork of [markus-michalski/osticket-subticket-manager](https://github.com/markus-michalski/osticket-subticket-manager). It carries the security and compatibility fixes listed in the [CHANGELOG](CHANGELOG.md); the fixes are offered upstream as pull requests. Releases of this fork: [github.com/studio-prisma/osticket-subticket-manager/releases](https://github.com/studio-prisma/osticket-subticket-manager/releases). The upstream [documentation and FAQ](https://faq.markus-michalski.net/en/osticket/subticket-manager) describe the plugin as a whole; where this README differs, this README applies to the fork.
 
-This plugin adds visual indicators, a panel in the ticket view for linking and unlinking tickets, and a hand-off from a parent ticket into the new-ticket form.
+---
 
-## Key Features
+## What it does
 
-- ✅ **Visual Parent Indicators** - Code-fork icons in queue lists show parent tickets at a glance
-- ✅ **Parent Badge** - Prominent badge below ticket number displays "Parent Ticket (X Sub-Tickets)"
-- ✅ **Integrated Panel** - Manage parent/child relationships directly in ticket view
-- ✅ **Link/Unlink Tickets** - Connect existing tickets or create new subtickets
-- ✅ **Permission-aware** - Every operation goes through osTicket's own ticket access and `ticket.link` role permission checks
-- ✅ **Configurable limits** - Maximum depth, maximum children per parent, nesting, and open-parent requirement
-- ✅ **AJAX-Based** - Real-time updates without page reloads
-- ✅ **No Core Modifications** - Uses osTicket's native infrastructure, no core file changes
+osTicket stores a parent for every ticket (`ticket_pid`) and has API methods for it, but no user interface. This plugin adds the interface:
 
-## Key Advantages
+- **Panel in the ticket view**: parent ticket and child tickets above the ticket tabs, with link, unlink and "Create Subticket" actions.
+- **Queue indicator**: a code-fork icon with the number of children next to parent tickets in every queue list.
+- **Parent badge**: "Parent Ticket (X Sub-Tickets)" below the ticket number.
+- **Hand-off into the new-ticket form**: "Create Subticket" opens osTicket's regular new-ticket form; the created ticket is linked to the parent.
+- **Admin overview**: `scp/subtickets.php` lists the hierarchies of the installation.
+- **Permission-aware**: every read, link and unlink goes through osTicket's own `Ticket::checkStaffPerm()` and the `ticket.link` role permission. Tickets the agent may not view are not shown.
+- **Configurable limits**: maximum depth, maximum children per parent, nesting, open-parent requirement.
+- **No core modifications**: the plugin uses osTicket's signals and copies two pages into `scp/`; it patches no core file.
 
-**Why this plugin is essential:**
-
-osTicket already has the technical foundation for parent/child tickets (database fields, API methods like `isChild()`, `getPid()`), but provides:
-- ❌ No user interface to manage relationships
-- ❌ No visual indicators in ticket lists
-- ❌ No workflow automation
-- ❌ No easy way to create or link subtickets
-
-This plugin makes osTicket's hidden parent/child infrastructure **actually usable** for daily support operations.
-
-## Use Cases
-
-- **Complex Support Requests** - Break down large issues into manageable subtasks
-- **Multi-Step Workflows** - Track progress across related tickets
-- **Team Collaboration** - Distribute work across multiple agents with clear hierarchy
-- **Project Management** - Use parent tickets as project containers
-- **Feature Requests** - Split implementation into tracked subtasks
-- **Bug Tracking** - Create separate tickets for testing, fixing, and documentation
+---
 
 ## Requirements
 
-- osTicket **1.18.x**
-- PHP **7.4+** (recommended: PHP 8.1+)
-- jQuery (included in osTicket)
-- MariaDB **10.3+** or MySQL **5.7+**
+- osTicket **1.18.x**. `isCompatible()` refuses anything older.
+- PHP **7.4 to 8.3**. CI lints and tests on every version in that range; 8.4 is not in the matrix.
+- MariaDB **10.3+** or MySQL **5.7+**. Uninstall cleanup is written for both.
+- The web server must serve `include/plugins/<plugin dir>/js/`. osTicket ships `include/.htaccess` with `Deny from all`; see [docs/INSTALL.md](docs/INSTALL.md#3-allow-the-plugins-javascript-to-be-served).
+- `scp/` must be writable by the PHP user when the plugin is enabled and after every update.
 
-## Installation
+---
 
-### Step 1: Install Plugin Files
+## Install
 
-#### Method 1: ZIP Download (Recommended)
-1. Download the latest release from [Releases](https://github.com/studio-prisma/osticket-subticket-manager/releases)
-2. Extract ZIP file
-3. Upload `subticket-manager` folder to `/include/plugins/` on osTicket server
+Full guide with abort points, kill switch and smoke test: **[docs/INSTALL.md](docs/INSTALL.md)** ([deutsch](docs/INSTALL.de.md)).
 
-#### Method 2: Git Repository
-```bash
-cd /path/to/osticket/include/plugins
-git clone https://github.com/studio-prisma/osticket-subticket-manager.git subticket-manager
-cd subticket-manager && composer install --no-dev
-```
+Short version:
 
-The `vendor/autoload.php` generated by Composer is required; the release ZIP already contains it.
+1. Download `subticket-manager-vX.Y.Z.zip` from the [latest release](https://github.com/studio-prisma/osticket-subticket-manager/releases/latest) and unzip it into `include/plugins/`. The archive contains the `subticket-manager/` folder and the Composer autoloader; nothing has to be built.
+2. Allow the web server to serve `include/plugins/subticket-manager/js/` (osTicket's `include/.htaccess` denies it).
+3. **Admin Panel → Manage → Plugins → Install**, then **Enable**. Enabling copies `subtickets.php` and `ajax-subticket.php` into `scp/`.
+4. Open a ticket: the **Parent Ticket / Child Tickets** panel sits above the ticket tabs.
 
-### Step 2: Enable Plugin in osTicket
-1. Login to osTicket Admin Panel
-2. Navigate to: **Admin Panel → Manage → Plugins**
-3. Find "Subticket Manager" in list
-4. Click **Enable**
-5. Plugin will automatically activate - no additional configuration needed
+Installing from git instead of the release package requires `composer install --no-dev` inside the plugin directory; `vendor/autoload.php` is not in the repository.
 
-### Step 3: Verify Installation
-1. Open any ticket
-2. Check for the **Parent Ticket / Child Tickets** panel above the ticket tabs
-3. Open a queue list - parent tickets should show code-fork icons (🔀)
+---
 
 ## Usage
 
-### Creating a Subticket
+**Create a subticket.** Open the parent ticket, click **Create Subticket** in the Child Tickets section. osTicket's new-ticket form opens; the ticket created there is linked to the parent. The hand-off expires after 10 minutes and is used once.
 
-1. Open the parent ticket
-2. Scroll to the **Child Tickets** section
-3. Click **Create Subticket**
-4. You'll be redirected to the "New Ticket" form
-5. After creating the ticket, it will be automatically linked to the parent
+**Link an existing ticket.** Open the ticket that is to become a child, click **Link to Parent**, enter the parent's ticket number or id, confirm.
 
-### Linking an Existing Ticket
+**Unlink.** In the child's Parent Ticket section click **Unlink from Parent**, or in the parent's Child Tickets list click **Unlink** next to the child.
 
-1. Open the ticket you want to make a child
-2. Click **Link to Parent** in the **Parent Ticket** section
-3. Enter the parent ticket number or ID
-4. Click **Link** to confirm
+**Indicators.** Queue lists show a code-fork icon with the child count on parent tickets; the ticket view shows the parent badge below the ticket number.
 
-### Unlinking Tickets
+Who may link or unlink is decided by osTicket: the agent needs access to **both** tickets and the `ticket.link` permission in the effective role.
 
-1. Open the child ticket
-2. In the **Parent Ticket** section, click **Unlink from Parent**
-3. Confirm the action
-
-Or from the parent ticket:
-1. Open the parent ticket
-2. In the **Child Tickets** list, click **Unlink** next to any child
-3. Confirm the action
-
-### Visual Indicators
-
-**Queue Lists:**
-- Parent tickets display a code-fork icon (🔀) with child count
-- Hover over the icon to see "X Sub-Ticket(s)"
-
-**Ticket View:**
-- Parent tickets show a prominent blue badge below the ticket number
-- Badge displays "Parent Ticket (X Sub-Tickets)"
+---
 
 ## Configuration
 
@@ -127,69 +75,61 @@ The defaults work out of the box. **Admin Panel → Manage → Plugins → Subti
 | Maximum Children per Parent | 50 | Linking a further subticket to a parent at the limit is refused (1-1000). |
 | Require Parent Ticket to be Open | on | Linking to a parent that is not open is refused. |
 | Allow Nested Subtickets | on | When off, a subticket cannot become a parent and a parent cannot itself be a subticket. |
-| Remove Data on Uninstall | off | Drops the plugin's tables and index on uninstall. Cannot be undone. |
+| Remove Data on Uninstall | off | Drops the plugin's tables, the `version` column and the two indexes on uninstall. Cannot be undone. |
 
-Who may link or unlink is decided by osTicket: the agent needs access to **both** tickets and the `ticket.link` permission in the effective role. Tickets the agent may not view are not shown in the panel.
+Values outside the stated ranges are rejected when the configuration is saved.
+
+---
+
+## Testing
+
+```bash
+composer install
+vendor/bin/phpunit
+```
+
+100 unit tests run against mocks of the osTicket classes (`tests/mocks/`): access checks for every AJAX action and the hand-off, cycle and limit enforcement, the table prefix (a subprocess with `TABLE_PREFIX=acme_`), the queue indicator injection into `<head>`, the panel rendering, and the plugin directory resolution of the AJAX handler. CI runs them on PHP 7.4 to 8.3 and builds the release package on every pull request.
+
+**Not verified by this fork's test suite:** behaviour inside a live osTicket installation. The mocks mirror osTicket's method signatures, not its permission model or rendering. The smoke test in [docs/INSTALL.md](docs/INSTALL.md#5-smoke-test) covers that part; run it after installing.
+
+---
+
+## Known limitations
+
+- **No automatic status workflow.** Auto-close of the parent, cascading status or assignment are not implemented. Earlier versions offered options for them that nothing read; they were removed in 2.0.5.
+- **`scp/` must be writable by the PHP user.** The two pages are copied into osTicket's `scp/` directory on enable and again whenever the plugin version changes. A read-only `scp/` leaves the panel without its AJAX endpoint.
+- **JavaScript is served from `include/plugins/`.** The panel script and the queue indicator are loaded from `include/plugins/<plugin dir>/js/`. osTicket's `include/.htaccess` denies that path; without an exception for the `js/` directory the panel renders but does nothing, and the queue icons stay empty.
+- **The deployed pages outlive a disabled plugin.** `scp/subtickets.php` and `scp/ajax-subticket.php` stay in place until the plugin is uninstalled. Both sit behind osTicket's staff login.
+- **The admin overview is system-wide** and shows the first 100 relationships to every agent, by design. It shows ticket numbers and statuses only.
+- **One copy of the plugin per installation.** The AJAX handler finds the plugin by searching `include/plugins/*/class.SubticketPlugin.php`; a second copy makes it stop with a 500.
+- **PHP 8.4 is not in the CI matrix.**
+
+---
 
 ## Troubleshooting
 
-### Problem: Parent indicators not showing in queue lists
+| Symptom | Check |
+|---|---|
+| Panel is visible but buttons do nothing; queue icons missing | Browser console shows `Failed to load subticket-panel.js`: the web server denies `include/plugins/<plugin dir>/js/`. See [docs/INSTALL.md](docs/INSTALL.md#3-allow-the-plugins-javascript-to-be-served). |
+| Panel not visible in the ticket view | Plugin enabled under Admin Panel → Plugins? You are in the staff interface, not the client portal? Browser cache cleared? |
+| "No parent ticket" shown but the relationship exists | `SELECT ticket_pid FROM <prefix>ticket WHERE ticket_id = X` in the database. If it is `NULL`, there is no relationship; unlink and link again. |
+| Cannot link or create a subticket | The agent needs `ticket.link` and access to both tickets; the parent must be open unless **Require Parent Ticket to be Open** is off; depth and children limits must not be reached; the hand-off expires after 10 minutes. The web server error log shows `[SUBTICKET-PLUGIN]` lines. |
+| Dialogs (due date, print) open off-screen on long ticket pages | Fixed in 2.0.4; `document.compatMode` in the browser console must read `CSS1Compat`. |
+| Every lookup fails with "Ticket not found" | Fixed in 2.0.5 for installations with a table prefix other than `ost_`. |
+| HTTP 500 from `scp/ajax-subticket.php` | More than one copy of the plugin under `include/plugins/`. Keep one. |
 
-**Check:**
-- Clear browser cache (Ctrl+Shift+R)
-- Check browser console for JavaScript errors
-- Verify jQuery is loaded (osTicket default)
-- Enable debug mode: `SubticketPanel.debug = true` in browser console
+---
 
-### Problem: "No parent ticket" shown but relationship exists
+## Contributing
 
-**Check:**
-- Database: `SELECT ticket_pid FROM ost_ticket WHERE ticket_id = X`
-- If `ticket_pid` is NULL, relationship doesn't exist in database
-- Try unlinking and re-linking the tickets
+See [CONTRIBUTING.md](CONTRIBUTING.md). Security issues: see [SECURITY.md](SECURITY.md), never a public issue.
 
-### Problem: Panel not visible in ticket view
+Issues that are not specific to this fork belong [upstream](https://github.com/markus-michalski/osticket-subticket-manager/issues).
 
-**Check:**
-- Plugin is enabled in Admin Panel → Plugins
-- Clear browser cache
-- Check if panel is collapsed (may be hidden by CSS)
-- Verify you're in the staff interface (not client portal)
+## License
 
-### Problem: Cannot create or link a subticket
-
-**Check:**
-- You have permission to create tickets, and the `ticket.link` permission in your role for both tickets
-- The parent ticket is open (unless **Require Parent Ticket to be Open** is off)
-- The configured depth and children limits are not reached
-- The hand-off from **Create Subticket** expires after 10 minutes; start again from the parent ticket
-- Check the web server error log for `[SUBTICKET-PLUGIN]` lines
-
-### Problem: Badge appears multiple times
-
-**Check:**
-- This was fixed in v1.5.1 - update to latest version
-- Clear browser cache after updating
-
-## 📄 License
-
-This Plugin is released under the GNU General Public License v2, compatible with osTicket core.
-
-See [LICENSE](./LICENSE) for details.
-
-## 💬 Support
-
-**📖 Full Documentation:** https://faq.markus-michalski.net/en/osticket/subticket-manager
-
-For questions or issues, please create an issue on GitHub:
-https://github.com/markus-michalski/osticket-subticket-manager/issues
-
-## 🤝 Contributing
-
-Developed by [Markus Michalski](https://github.com/markus-michalski)
-
-Inspired by the osTicket community's need for a user-friendly way to manage parent/child ticket relationships using osTicket's native infrastructure.
+[GNU General Public License v2.0](LICENSE), compatible with osTicket core. The plugin is written by [Markus Michalski](https://github.com/markus-michalski); this fork is maintained by studio-prisma.
 
 ## Changelog
 
-See [CHANGELOG.md](./CHANGELOG.md) for version history.
+See [CHANGELOG.md](CHANGELOG.md) for version history.

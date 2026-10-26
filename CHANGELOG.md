@@ -11,8 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `tools/build-zip.sh` builds the release package from `.releaseinclude`. It refuses a `vendor/` from a development install, a class under `src/` that is not listed, and a literal secret or local path in the staged files; the archive is reproducible for a given commit.
 - `Release` workflow: runs on a `v*` tag or by hand for an existing tag, checks that `plugin.php` matches the tag, builds the package, takes the release notes from the matching `CHANGELOG.md` section and uploads `subticket-manager-vX.Y.Z.zip`.
 - Issue templates (bug, feature, compatibility) with a private security-advisory link, a pull request template, Dependabot for GitHub Actions and the Composer dev dependencies, and `.gitattributes` forcing LF.
+- `SECURITY.md` with the in-scope and out-of-scope list of the 2.0.5 audit, `CONTRIBUTING.md` with setup, checks, conventions and the release process, `README.de.md`, and `docs/INSTALL.md` + `docs/INSTALL.de.md` with abort points, kill switch, smoke test and security gate.
 
 ### Changed
+- README restructured: requirements, short install, testing, known limitations (no auto-close, `scp/` must be writable, JavaScript is served from `include/plugins/` and osTicket's `include/.htaccess` denies it) and a troubleshooting table; the full install guide moved to `docs/`.
 - CI: `ci.yml` is replaced by `validate.yml`. Lint and PHPUnit run on PHP 7.4 to 8.3, `composer validate --strict` and a build of the release package run once, `actionlint` checks the workflows, and a `Gate` job aggregates everything for branch protection. Actions are pinned to major versions, the workflow also runs weekly.
 
 ### Deprecated
