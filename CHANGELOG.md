@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Nothing yet
+
+### Changed
+- Nothing yet
+
+### Deprecated
+- Nothing yet
+
+### Removed
+- Nothing yet
+
+### Fixed
+- Nothing yet
+
+### Security
+- Nothing yet
+
+## [2.0.6] - 2026-10-26
+
+### Added
 - `tools/build-zip.sh` builds the release package from `.releaseinclude`. It refuses a `vendor/` from a development install, a class under `src/` that is not listed, and a literal secret or local path in the staged files; the archive is reproducible for a given commit.
 - `Release` workflow: runs on a `v*` tag or by hand for an existing tag, checks that `plugin.php` matches the tag, builds the package, takes the release notes from the matching `CHANGELOG.md` section and uploads `subticket-manager-vX.Y.Z.zip`.
 - Issue templates (bug, feature, compatibility) with a private security-advisory link, a pull request template, Dependabot for GitHub Actions and the Composer dev dependencies, and `.gitattributes` forcing LF.
@@ -18,18 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation: the Apache exception for `include/plugins/<dir>/js/` uses `Order allow,deny` + `Allow from all` + `Require all granted`; a bare `Require all granted` does not override osTicket's 2.2-style `Deny from all` (verified on Apache 2.4.69). README and INSTALL state what the live smoke test on osTicket 1.18.4 verified and what remains unverified, and INSTALL has a troubleshooting row for the disabled instance of 2.0.5.
 - CI: `ci.yml` is replaced by `validate.yml`. Lint and PHPUnit run on PHP 7.4 to 8.3, `composer validate --strict` and a build of the release package run once, `actionlint` checks the workflows, and a `Gate` job aggregates everything for branch protection. Actions are pinned to major versions, the workflow also runs weekly.
 
-### Deprecated
-- Nothing yet
-
-### Removed
-- Nothing yet
-
 ### Fixed
 - The plugin instance that `enable()` creates on install stayed **disabled** on osTicket 1.18.4, so the plugin never bootstrapped until an admin enabled the instance by hand under *Instances*. osTicket stores the new instance through the configuration form; that request carries no limit values, and `pre_save()` (introduced in 2.0.5) rejected the empty fields. An empty limit now means the default, and `enable()` passes every option explicitly. Found on a live install, covered by `ConfigPreSaveTest`.
 - The queue indicator loader was injected into the **client portal's** `tickets.php` as well, because the staff check relied on `STAFFINC_DIR`, which osTicket defines for every request. The loader is now limited to queue pages under `scp/`. Found on a live install, covered by `QueueIndicatorScopeTest`.
-
-### Security
-- Nothing yet
 
 ## [2.0.5] - 2026-10-26
 
@@ -137,6 +148,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add QueueColumnAnnotation mock for PHPUnit tests
 - Add missing Queue mock for PHPUnit tests
 
+[2.0.6]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.6
 [2.0.5]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.5
 [2.0.4]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.4
 [2.0.3]: https://github.com/markus-michalski/osticket-subticket-manager/releases/tag/v2.0.3
