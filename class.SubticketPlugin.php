@@ -76,6 +76,7 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 use SubticketManager\Asset\AssetDeployer;
 use SubticketManager\Config\ConfigCache;
 use SubticketManager\Database\DatabaseService;
+use SubticketManager\Database\Table;
 use SubticketManager\Hierarchy\HierarchyService;
 use SubticketManager\Security\TicketAccessGuard;
 use SubticketManager\Signal\TicketEventHandler;
@@ -611,7 +612,9 @@ class SubticketPlugin extends Plugin
         }
 
         if (function_exists('db_query')) {
-            $result = db_query("SHOW COLUMNS FROM `ost_ticket` LIKE 'ticket_pid'");
+            // Respect the configured table prefix, otherwise this reports a
+            // false negative on every installation without "ost_".
+            $result = db_query("SHOW COLUMNS FROM `" . Table::name('ticket') . "` LIKE 'ticket_pid'");
             if (db_num_rows($result) == 0) {
                 subticket_log('Required column ticket_pid not found');
                 return false;

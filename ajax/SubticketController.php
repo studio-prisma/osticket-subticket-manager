@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use SubticketManager\Database\Table;
 use SubticketManager\Security\TicketAccessGuard;
 
 /**
@@ -346,8 +347,8 @@ class SubticketController {
         $sql = "SELECT
                     parent.ticket_id,
                     COUNT(child.ticket_id) as child_count
-                FROM ost_ticket parent
-                LEFT JOIN ost_ticket child ON parent.ticket_id = child.ticket_pid
+                FROM " . Table::name('ticket') . " parent
+                LEFT JOIN " . Table::name('ticket') . " child ON parent.ticket_id = child.ticket_pid
                 WHERE parent.ticket_id IN ($idsList)
                 GROUP BY parent.ticket_id";
 
