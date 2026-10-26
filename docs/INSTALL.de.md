@@ -79,14 +79,16 @@ Das Panel-Skript und der Queue-Indikator werden vom Browser aus `include/plugins
 
 ```apache
 # Wird vom Browser geladen; alles andere unter include/ bleibt gesperrt.
-<IfModule mod_authz_core.c>
-    Require all granted
-</IfModule>
-<IfModule !mod_authz_core.c>
-    Order allow,deny
-    Allow from all
-</IfModule>
+# osTickets include/.htaccess nutzt die Apache-2.2-Syntax (Deny from all).
+# Ein bloßes "Require all granted" hebt das auf Apache 2.4 mit geladenem
+# mod_access_compat (Standard) NICHT auf; das Order/Allow-Paar ist Pflicht.
+# "Require all granted" deckt eine auf 2.4-Syntax umgeschriebene include/.htaccess ab.
+Order allow,deny
+Allow from all
+Require all granted
 ```
+
+Geprüft auf Apache 2.4.69 mit der mitgelieferten `include/.htaccess`: `Require all granted` allein antwortet weiter mit 403, die drei Zeilen oben liefern 200 für das Verzeichnis `js/` und lassen `class.SubticketPlugin.php` bei 403.
 
 **nginx**: eine Location für das Verzeichnis `js/` **vor** der Regel eintragen, die `include/` sperrt:
 
@@ -192,7 +194,7 @@ Liegen die beiden Seiten noch da, war `scp/` bei der Deinstallation nicht schrei
 
 ## Bekannte Grenzen
 
-- Nicht geprüft: das Verhalten auf PHP 8.4, auf anderen osTicket-Versionen als 1.18.x und mit einem Webserver, der `include/` über einen Front-Controller ausliefert. Die CI-Tests laufen gegen Mocks der osTicket-Klassen, nicht gegen eine laufende Installation; der Smoke-Test oben ist die Live-Prüfung.
+- Geprüft auf osTicket 1.18.4, PHP 8.2, Apache 2.4 (`AllowOverride All`, mitgelieferte `include/.htaccess`), MariaDB 10.11, Tabellen-Prefix `acme_`: jede Zeile des Smoke-Tests und des Security-Gates oben, als Nicht-Admin-Agentin. Nicht geprüft: PHP 8.4, andere osTicket-Versionen, nginx und der Update-Pfad von einer Version vor 2.0.5. Die CI-Tests laufen gegen Mocks der osTicket-Klassen; der Smoke-Test oben ist die Live-Prüfung für die eigene Instanz.
 - Kein automatischer Status-Workflow (Auto-Close, kaskadierender Status oder kaskadierende Zuweisung).
 - `scp/` muss beim Aktivieren und bei jedem Update schreibbar sein; die beiden Seiten bleiben erreichbar, solange das Plugin deaktiviert ist.
 - Die Admin-Übersicht ist systemweit und auf 100 Zeilen begrenzt.
@@ -205,6 +207,7 @@ Liegen die beiden Seiten noch da, war `scp/` bei der Deinstallation nicht schrei
 | Panel sichtbar, Buttons tot, Konsole zeigt `Failed to load subticket-panel.js` | `include/` vom Webserver gesperrt | Schritt 3 |
 | Aktivieren meldet `Target directory not writable` | `scp/` für den PHP-Benutzer nicht schreibbar | Schritt 0, dann erneut aktivieren |
 | Panel fehlt, kein Konsolenfehler | Plugin deaktiviert, Kundenportal statt Agenten-Oberfläche, oder Browser-Cache | Admin Panel → Plugins prüfen; hart neu laden |
+| Plugin steht auf *Active*, aber kein Panel, keine Queue-Symbole, keine `scp/.subticket-deployed-version` | die Plugin-**Instanz** ist deaktiviert (2.0.5 ließ sie bei der Installation so) | Admin Panel → Manage → Plugins → Subticket Manager → *Instances* → Instanz auf Enabled setzen; im Release nach 2.0.5 behoben |
 | Dialoge öffnen auf langen Ticketseiten außerhalb des Sichtbereichs, `document.compatMode` ist `BackCompat` | etwas gibt vor dem Doctype aus; das Plugin selbst tut das seit 2.0.4 nicht mehr | andere Plugins und eigenen Code in `include/` prüfen |
 | „Ticket not found" bei jedem Verknüpfungsversuch | anderer Tabellen-Prefix als `ost_` mit einer Plugin-Version vor 2.0.5 | Update |
 | HTTP 500 von `scp/ajax-subticket.php`, Log meldet `Multiple SubticketPlugin installations` | zwei Kopien unter `include/plugins/` | eine behalten |

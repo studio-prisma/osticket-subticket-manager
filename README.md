@@ -90,7 +90,9 @@ vendor/bin/phpunit
 
 100 unit tests run against mocks of the osTicket classes (`tests/mocks/`): access checks for every AJAX action and the hand-off, cycle and limit enforcement, the table prefix (a subprocess with `TABLE_PREFIX=acme_`), the queue indicator injection into `<head>`, the panel rendering, and the plugin directory resolution of the AJAX handler. CI runs them on PHP 7.4 to 8.3 and builds the release package on every pull request.
 
-**Not verified by this fork's test suite:** behaviour inside a live osTicket installation. The mocks mirror osTicket's method signatures, not its permission model or rendering. The smoke test in [docs/INSTALL.md](docs/INSTALL.md#5-smoke-test) covers that part; run it after installing.
+**Verified against a live osTicket 1.18.4** (PHP 8.2, Apache 2.4 with `AllowOverride All`, MariaDB 10.11, table prefix `acme_`), installed from the v2.0.5 release package with the fixes of the following release, as a non-admin agent with access to one of two departments: panel in the ticket view, `document.compatMode === "CSS1Compat"`, link and unlink within the agent's department, link to a ticket of another department refused without disclosing it, cycle refused, hand-off from **Create Subticket** links the new ticket, queue icon with child count, admin overview, client portal without panel or hierarchy data, logged-out endpoint redirects to the login, `action=version` answers 403 to a non-admin, writing actions without the CSRF token answer 400. The smoke test in [docs/INSTALL.md](docs/INSTALL.md#5-smoke-test) is that list; run it after installing on your own instance.
+
+**Not verified:** PHP 8.4, osTicket versions other than 1.18.4, nginx, and the update path from a version before 2.0.5.
 
 ---
 

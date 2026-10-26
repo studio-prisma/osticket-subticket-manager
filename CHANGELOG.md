@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - README restructured: requirements, short install, testing, known limitations (no auto-close, `scp/` must be writable, JavaScript is served from `include/plugins/` and osTicket's `include/.htaccess` denies it) and a troubleshooting table; the full install guide moved to `docs/`.
+- Documentation: the Apache exception for `include/plugins/<dir>/js/` uses `Order allow,deny` + `Allow from all` + `Require all granted`; a bare `Require all granted` does not override osTicket's 2.2-style `Deny from all` (verified on Apache 2.4.69). README and INSTALL state what the live smoke test on osTicket 1.18.4 verified and what remains unverified, and INSTALL has a troubleshooting row for the disabled instance of 2.0.5.
 - CI: `ci.yml` is replaced by `validate.yml`. Lint and PHPUnit run on PHP 7.4 to 8.3, `composer validate --strict` and a build of the release package run once, `actionlint` checks the workflows, and a `Gate` job aggregates everything for branch protection. Actions are pinned to major versions, the workflow also runs weekly.
 
 ### Deprecated
