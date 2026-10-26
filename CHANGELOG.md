@@ -27,7 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration options that nothing read: `auto_close_parent`, `cascade_hold`, `cascade_assignment`, `show_children_in_queue`, `notify_on_auto_close` (upstream issue #6). Auto-close is not implemented.
 
 ### Fixed
-- Nothing yet
+- All queries respect osTicket's configurable table prefix (`TABLE_PREFIX` in `ost-config.php`) through the new `Table::name()` helper. Installations with a prefix other than `ost_` got "Ticket not found" on every lookup, and `isCompatible()` reported a false negative (upstream PR #5, completed).
+- The foreign-key existence check is scoped to the current database schema and the constraint's own name.
+- `.releaseinclude` lists `src/Security/TicketAccessGuard.php` and `src/Database/Table.php`, so the release package contains them.
 
 ### Security
 - The `subticket_parent` hand-off from the ticket view to the new-ticket form could be set from any page, including the client portal, never expired, and was applied with a raw UPDATE without checking who the agent was or whether the parent was accessible. The candidate is now only accepted from `scp/tickets.php?a=open`, expires after 10 minutes, and is consumed only in a staff request by an agent who may link the parent, through the same checks as a manual link.
