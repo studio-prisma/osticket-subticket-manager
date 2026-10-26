@@ -7,14 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Security
-- The hierarchy overview (`scp/subtickets.php`) listed up to 100 hierarchies with ticket number, subject and status across all departments to every agent; it only checked `isStaff()`. It now applies the rule of the ticket-view panel: children the agent cannot view are left out, parents the agent cannot view are shown without number, subject or link, and a parent with only hidden children does not appear. The rule lives in `src/UI/OverviewFilter.php`.
-
 ### Added
 - Nothing yet
 
 ### Changed
-- `plugin.php` `url` points at this fork. osTicket's *Plugin Update Check* resolves the repository from that field and compares the installed version with the latest GitHub release there; with the upstream URL (latest release v2.0.3) an installation of this fork never saw its own releases.
+- Nothing yet
 
 ### Deprecated
 - Nothing yet
@@ -27,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - Nothing yet
+
+## [2.0.8] - 2026-10-26
+
+### Security
+- The hierarchy overview (`scp/subtickets.php`) listed up to 100 hierarchies with ticket number, subject and status across all departments to every agent; it only checked `isStaff()`. It now applies the rule of the ticket-view panel: children the agent cannot view are left out, parents the agent cannot view are shown without number, subject or link, and a parent with only hidden children does not appear. The rule lives in `src/UI/OverviewFilter.php`.
+
+### Changed
+- The release workflow reads the tag from `env` and accepts `vX.Y.Z` and `vX.Y.Z-rc.N` only, instead of expanding the tag input straight into shell code.
 
 ## [2.0.7] - 2026-10-26
 
@@ -156,6 +161,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add QueueColumnAnnotation mock for PHPUnit tests
 - Add missing Queue mock for PHPUnit tests
 
+[2.0.8]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.8
 [2.0.7]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.7
 [2.0.6]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.6
 [2.0.5]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.5
