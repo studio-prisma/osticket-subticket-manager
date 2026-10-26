@@ -1,0 +1,95 @@
+name: Bug report
+description: Something does not work as documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do **not** paste ticket contents, customer data or database dumps into
+        this form. Redact hostnames and ticket numbers if they are not public.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a ticket that has subtickets
+        2. Click "Link to Parent"
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: osticket-version
+    attributes:
+      label: osTicket version
+      placeholder: "1.18.2"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "8.3.12"
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: "2.0.5"
+    validations:
+      required: true
+
+  - type: input
+    id: database
+    attributes:
+      label: Database server and table prefix
+      placeholder: "MariaDB 10.11, prefix ost_"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Ticket view panel (parent / children)
+        - Link or unlink
+        - Create subticket hand-off to the new-ticket form
+        - Queue indicator (code-fork icon)
+        - Admin overview (scp/subtickets.php)
+        - AJAX endpoint (scp/ajax-subticket.php)
+        - Plugin enable, update or uninstall
+        - Plugin configuration
+        - Other / unclear
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log lines
+      description: Web server error log entries containing "SUBTICKET". Redact IPs and ticket numbers if needed.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I tested with a cleared browser cache and checked the browser console for errors
+          required: true
+        - label: The agent I tested with has the `ticket.link` permission and access to both tickets
+        - label: I have removed all customer data and credentials from this report
+          required: true

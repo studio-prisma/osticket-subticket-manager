@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest a capability this plugin does not have yet
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to achieve that the plugin does not support today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      description: |
+        This plugin manages parent/child links between existing osTicket tickets and
+        shows them in the staff interface. Automatic status workflows (auto-close,
+        cascading status or assignment) are not implemented; a request for them is
+        welcome, but say so explicitly so it is not mistaken for a bug report.
+      options:
+        - label: I checked the open issues and the upstream repository for an existing request
+          required: true
