@@ -19,6 +19,7 @@ src/Database/Table.php
 src/Hierarchy/HierarchyService.php
 src/Security/TicketAccessGuard.php
 src/Signal/TicketEventHandler.php
+src/UI/OverviewFilter.php
 src/UI/PanelRenderer.php
 
 # Vendor (Runtime Dependencies Only - No Dev Dependencies!)
