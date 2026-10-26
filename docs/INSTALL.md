@@ -79,14 +79,16 @@ The panel script and the queue indicator are loaded by the browser from `include
 
 ```apache
 # Served by the browser; everything else under include/ stays denied.
-<IfModule mod_authz_core.c>
-    Require all granted
-</IfModule>
-<IfModule !mod_authz_core.c>
-    Order allow,deny
-    Allow from all
-</IfModule>
+# osTicket's include/.htaccess uses the Apache 2.2 syntax (Deny from all).
+# A bare "Require all granted" does NOT override it on Apache 2.4 with
+# mod_access_compat loaded (the default); the Order/Allow pair is required.
+# "Require all granted" covers an include/.htaccess rewritten to 2.4 syntax.
+Order allow,deny
+Allow from all
+Require all granted
 ```
+
+Verified on Apache 2.4.69 with the stock `include/.htaccess`: `Require all granted` alone still answers 403, the three lines above answer 200 for the `js/` directory and keep `class.SubticketPlugin.php` at 403.
 
 **nginx**: add a location for the `js/` directory **before** the rule that denies `include/`:
 
@@ -192,7 +194,7 @@ If the two pages are still there, `scp/` was not writable during uninstall; remo
 
 ## Known limitations
 
-- Not verified: the plugin's behaviour on PHP 8.4, on osTicket versions other than 1.18.x, and with a web server that serves `include/` through a front controller. The CI suite runs against mocks of the osTicket classes, not against a live installation; the smoke test above is the live check.
+- Verified on osTicket 1.18.4, PHP 8.2, Apache 2.4 (`AllowOverride All`, stock `include/.htaccess`), MariaDB 10.11, table prefix `acme_`: every row of the smoke test and the security gate above, as a non-admin agent. Not verified: PHP 8.4, other osTicket versions, nginx, and the update path from a version before 2.0.5. The CI suite runs against mocks of the osTicket classes; the smoke test above is the live check for your own instance.
 - No automatic status workflow (auto-close, cascading status or assignment).
 - `scp/` must be writable on enable and on every update; the two pages stay reachable while the plugin is disabled.
 - The admin overview is system-wide and limited to 100 rows.
@@ -205,6 +207,7 @@ If the two pages are still there, `scp/` was not writable during uninstall; remo
 | Panel visible, buttons dead, console shows `Failed to load subticket-panel.js` | `include/` denied by the web server | step 3 |
 | Enable reports `Target directory not writable` | `scp/` not writable by the PHP user | step 0, then enable again |
 | Panel missing, no console error | plugin disabled, client portal instead of staff interface, or browser cache | check Admin Panel → Plugins; hard reload |
+| Plugin shows *Active*, but no panel, no queue icons, no `scp/.subticket-deployed-version` | the plugin **instance** is disabled (2.0.5 left it that way on install) | Admin Panel → Manage → Plugins → Subticket Manager → *Instances* → set the instance to Enabled; fixed in the release after 2.0.5 |
 | Dialogs open off-screen on long ticket pages, `document.compatMode` is `BackCompat` | something prints before the doctype; the plugin itself stopped doing that in 2.0.4 | check other plugins and custom code in `include/` |
 | "Ticket not found" on every link attempt | table prefix other than `ost_` with a plugin version before 2.0.5 | update |
 | HTTP 500 from `scp/ajax-subticket.php`, log says `Multiple SubticketPlugin installations` | two copies under `include/plugins/` | keep one |

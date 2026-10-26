@@ -92,7 +92,9 @@ vendor/bin/phpunit
 
 100 Unit-Tests laufen gegen Mocks der osTicket-Klassen (`tests/mocks/`): Zugriffsprüfungen für jede AJAX-Aktion und die Übergabe, Zyklus- und Limit-Durchsetzung, der Tabellen-Prefix (ein Subprozess mit `TABLE_PREFIX=acme_`), das Einfügen des Queue-Indikators in `<head>`, das Rendern des Panels und die Plugin-Verzeichnis-Auflösung des AJAX-Handlers. CI führt sie auf PHP 7.4 bis 8.3 aus und baut bei jedem Pull Request das Release-Paket.
 
-**Nicht durch die Tests dieses Forks geprüft:** das Verhalten in einer laufenden osTicket-Installation. Die Mocks bilden osTickets Methodensignaturen nach, nicht das Berechtigungsmodell und nicht das Rendering. Diesen Teil deckt der Smoke-Test in [docs/INSTALL.de.md](docs/INSTALL.de.md#5-smoke-test) ab; nach der Installation durchführen.
+**Geprüft gegen ein laufendes osTicket 1.18.4** (PHP 8.2, Apache 2.4 mit `AllowOverride All`, MariaDB 10.11, Tabellen-Prefix `acme_`), installiert aus dem Release-Paket v2.0.5 mit den Korrekturen des folgenden Releases, als Nicht-Admin-Agentin mit Zugriff auf eines von zwei Departments: Panel in der Ticketansicht, `document.compatMode === "CSS1Compat"`, Verknüpfen und Lösen im eigenen Department, Verknüpfen mit einem Ticket eines anderen Departments abgelehnt ohne es preiszugeben, Zyklus abgelehnt, Übergabe über **Create Subticket** verknüpft das neue Ticket, Queue-Symbol mit Kinderzahl, Admin-Übersicht, Kundenportal ohne Panel und ohne Hierarchiedaten, abgemeldeter Endpunkt leitet zum Login, `action=version` antwortet einem Nicht-Admin mit 403, schreibende Aktionen ohne CSRF-Token mit 400. Der Smoke-Test in [docs/INSTALL.de.md](docs/INSTALL.de.md#5-smoke-test) ist genau diese Liste; nach der Installation auf der eigenen Instanz durchführen.
+
+**Nicht geprüft:** PHP 8.4, andere osTicket-Versionen als 1.18.4, nginx und der Update-Pfad von einer Version vor 2.0.5.
 
 ---
 
