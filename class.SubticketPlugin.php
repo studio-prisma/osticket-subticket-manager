@@ -107,6 +107,33 @@ class SubticketPlugin extends Plugin
     }
 
     /**
+     * Form values for the instance that enable() creates
+     *
+     * Includes every configuration option with its default, so the form
+     * osTicket runs on the new instance validates and the instance is
+     * stored enabled.
+     *
+     * @return array<string, mixed>
+     */
+    public static function defaultInstanceVars(string $name): array
+    {
+        $vars = [
+            'name' => $name,
+            'isactive' => 1,
+            'notes' => 'Auto-created singleton instance',
+            'require_parent_open' => 1,
+            'allow_nested_subtickets' => 1,
+            'remove_data_on_uninstall' => 0,
+        ];
+
+        foreach (SubticketPluginConfig::limits() as $key => [, , $default]) {
+            $vars[$key] = (string)$default;
+        }
+
+        return $vars;
+    }
+
+    /**
      * Enable plugin and auto-create instance if singleton
      *
      * @param array<string> $errors
@@ -120,11 +147,11 @@ class SubticketPlugin extends Plugin
         // Auto-create instance for singleton plugin
         if ($this->isSingleton() && $this->getNumInstances() === 0) {
             subticket_log('Creating singleton instance...');
-            $vars = [
-                'name' => $this->getName(),
-                'isactive' => 1,
-                'notes' => 'Auto-created singleton instance',
-            ];
+            // osTicket runs the instance through the configuration form and
+            // leaves it disabled when the form does not validate, so the
+            // limits are passed explicitly instead of relying on the field
+            // defaults, which the form does not apply for this request.
+            $vars = self::defaultInstanceVars($this->getName());
 
             if (!$this->addInstance($vars, $errors)) {
                 subticket_log('addInstance FAILED. Errors: ' . json_encode($errors));
