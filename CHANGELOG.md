@@ -24,7 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing yet
 
 ### Fixed
-- Nothing yet
+- The plugin instance that `enable()` creates on install stayed **disabled** on osTicket 1.18.4, so the plugin never bootstrapped until an admin enabled the instance by hand under *Instances*. osTicket stores the new instance through the configuration form; that request carries no limit values, and `pre_save()` (introduced in 2.0.5) rejected the empty fields. An empty limit now means the default, and `enable()` passes every option explicitly. Found on a live install, covered by `ConfigPreSaveTest`.
+- The queue indicator loader was injected into the **client portal's** `tickets.php` as well, because the staff check relied on `STAFFINC_DIR`, which osTicket defines for every request. The loader is now limited to queue pages under `scp/`. Found on a live install, covered by `QueueIndicatorScopeTest`.
 
 ### Security
 - Nothing yet
