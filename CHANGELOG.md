@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing yet
 
 ### Changed
-- License metadata matches the license grant: `composer.json` and the file header say `GPL-2.0-or-later` (the notice grants "version 2 or (at your option) any later version"; `composer.json` said `GPL-2.0-only`). `LICENSE` keeps the author's notice and now carries the full GPL-2.0 text, which the license requires to accompany the program (upstream issue #8).
+- Nothing yet
 
 ### Deprecated
 - Nothing yet
@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Nothing yet
+
+### Security
+- Nothing yet
+
+## [2.0.9] - 2026-10-27
+
+### Changed
+- License metadata matches the license grant: `composer.json` and the file header say `GPL-2.0-or-later` (the notice grants "version 2 or (at your option) any later version"; `composer.json` said `GPL-2.0-only`). `LICENSE` keeps the author's notice and now carries the full GPL-2.0 text, which the license requires to accompany the program (upstream issue #8).
 
 ### Security
 - Linking a ticket that already has a parent moved it away from that parent without checking access to it. Re-parenting now requires the link permission on the current parent as well, the same check unlinking makes (rest of upstream issue #7).
@@ -163,6 +171,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add QueueColumnAnnotation mock for PHPUnit tests
 - Add missing Queue mock for PHPUnit tests
 
+[2.0.9]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.9
 [2.0.8]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.8
 [2.0.7]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.7
 [2.0.6]: https://github.com/studio-prisma/osticket-subticket-manager/releases/tag/v2.0.6
