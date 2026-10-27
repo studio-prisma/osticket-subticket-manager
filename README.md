@@ -130,7 +130,7 @@ Issues that are not specific to this fork belong [upstream](https://github.com/m
 
 ## License
 
-[GNU General Public License v2.0](LICENSE), compatible with osTicket core. The plugin is written by [Markus Michalski](https://github.com/markus-michalski); this fork is maintained by studio-prisma.
+[GNU General Public License v2.0 or later](LICENSE), compatible with osTicket core. The plugin is written by [Markus Michalski](https://github.com/markus-michalski); this fork is maintained by studio-prisma.
 
 ## Changelog
 

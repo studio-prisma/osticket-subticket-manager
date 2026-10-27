@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing yet
 
 ### Changed
-- Nothing yet
+- License metadata matches the license grant: `composer.json` and the file header say `GPL-2.0-or-later` (the notice grants "version 2 or (at your option) any later version"; `composer.json` said `GPL-2.0-only`). `LICENSE` keeps the author's notice and now carries the full GPL-2.0 text, which the license requires to accompany the program (upstream issue #8).
 
 ### Deprecated
 - Nothing yet
@@ -23,7 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing yet
 
 ### Security
-- Nothing yet
+- Linking a ticket that already has a parent moved it away from that parent without checking access to it. Re-parenting now requires the link permission on the current parent as well, the same check unlinking makes (rest of upstream issue #7).
+- The batch parent status used by the queue indicator reported child counts for any ticket ID. Counts are now given only for tickets the agent may view; other IDs answer like a ticket without children.
+- An unknown parent number in a link request answered differently from a parent the agent cannot access, which told which ticket numbers exist. Both now get the same access-denied message.
 
 ## [2.0.8] - 2026-10-26
 

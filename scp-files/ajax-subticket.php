@@ -13,7 +13,7 @@
  * - POST /scp/ajax-subticket.php?action=unlink
  *
  * @package SubticketManager
- * @license GPL-2.0
+ * @license GPL-2.0-or-later
  */
 
 define('AJAX_REQUEST', 1);

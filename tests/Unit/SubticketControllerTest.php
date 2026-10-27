@@ -619,11 +619,12 @@ class SubticketControllerTest extends TestCase
      */
     public function testLinkExistingTicketReturnsErrorWhenOperationFails()
     {
-        // Mock FAILED link operation: Child ticket doesn't exist
-        // Plugin's linkTicket() checks existence with SELECT queries
+        // Mock FAILED link operation: the parent number resolves and the child
+        // has no current parent, but linkTicket() does not find the child.
         $this->mockMultipleDbQueries(array(
-            array(), // Child doesn't exist (empty result)
-            array(array('ticket_id' => 1)) // Parent exists (not reached if child check fails first)
+            array(array('ticket_id' => 1)), // parent number resolves to ticket 1
+            array(),                        // getParent(child): no current parent
+            array(),                        // linkTicket(): child doesn't exist
         ));
 
         // Mock valid CSRF token

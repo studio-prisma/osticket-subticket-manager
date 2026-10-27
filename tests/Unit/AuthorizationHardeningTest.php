@@ -280,6 +280,64 @@ class AuthorizationHardeningTest extends TestCase
         $this->assertEmpty($this->updateQueries());
     }
 
+    public function testRelinkRequiresAccessToTheCurrentParent(): void
+    {
+        // Agent may link child 5 and new parent 9, but not the current parent 1.
+        $controller = $this->controller($this->guardAllowing([5, 9]));
+        $this->mockQueries([
+            [['ticket_id' => 9]], // new parent number resolves to ticket 9
+            [['ticket_id' => 1, 'number' => '100001', 'subject' => 'Parent', 'status' => 'Open']], // getParent(5)
+        ]);
+
+        $response = $controller->linkExistingTicket(5, '100009', self::TOKEN);
+
+        $this->assertFalse($response['success']);
+        $this->assertSame(\SubticketController::ACCESS_DENIED_MESSAGE, $response['message']);
+        $this->assertEmpty($this->updateQueries(), 'the child must not be moved away from a parent the agent cannot access');
+    }
+
+    public function testUnknownParentNumberAnswersLikeADeniedOne(): void
+    {
+        $controller = $this->controller($this->guardAllowing([5]));
+        $this->mockQueries([
+            [], // parent number does not exist
+        ]);
+
+        $response = $controller->linkExistingTicket(5, '999999', self::TOKEN);
+
+        $this->assertFalse($response['success']);
+        $this->assertSame(\SubticketController::ACCESS_DENIED_MESSAGE, $response['message']);
+    }
+
+    public function testBatchParentStatusCountsOnlyVisibleTickets(): void
+    {
+        $controller = $this->controller($this->guardAllowing([1]));
+        $this->mockQueries([
+            [['ticket_id' => 1, 'child_count' => 2]],
+        ]);
+
+        $response = $controller->getBatchParentStatus('1,2');
+
+        $this->assertTrue($response['success']);
+        $this->assertSame(['is_parent' => true, 'child_count' => 2], $response['data'][1]);
+        $this->assertSame(['is_parent' => false, 'child_count' => 0], $response['data'][2]);
+        $queries = get_test_db_queries();
+        $this->assertCount(1, $queries);
+        $this->assertStringContainsString('IN (1)', $queries[0]['query']);
+    }
+
+    public function testBatchParentStatusRunsNoQueryWhenNothingIsVisible(): void
+    {
+        $controller = $this->controller($this->guardAllowing([]));
+
+        $response = $controller->getBatchParentStatus('3,4');
+
+        $this->assertTrue($response['success']);
+        $this->assertSame(['is_parent' => false, 'child_count' => 0], $response['data'][3]);
+        $this->assertSame(['is_parent' => false, 'child_count' => 0], $response['data'][4]);
+        $this->assertEmpty(get_test_db_queries());
+    }
+
     public function testUnlinkRequiresAccessToTheCurrentParent(): void
     {
         $controller = $this->controller($this->guardAllowing([2]));

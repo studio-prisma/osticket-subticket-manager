@@ -280,11 +280,13 @@ class SubticketController {
             return $childAccess;
         }
 
-        // 5. Resolve the parent NUMBER (what the agent sees) to the internal ID
+        // 5. Resolve the parent NUMBER (what the agent sees) to the internal ID.
+        // An unknown number answers like a denied one, so the response does
+        // not tell which ticket numbers exist.
         $resolvedParentId = $this->plugin->getTicketIdByNumber($parentId);
         if ($resolvedParentId === null) {
             subticket_log('Parent number not found', "parentNumber=$parentId");
-            return $this->errorResponse('Failed to link tickets');
+            return $this->errorResponse(self::ACCESS_DENIED_MESSAGE);
         }
 
         // 6. SECURITY: ... and the parent as well
@@ -292,6 +294,20 @@ class SubticketController {
         if ($parentAccess !== true) {
             subticket_log('Access denied to parent ticket', "parentId=$resolvedParentId");
             return $parentAccess;
+        }
+
+        // 6b. SECURITY: linking a child that already has a parent moves it away
+        // from that parent. That is an unlink of the old parent and needs the
+        // same check unlinkTicket() makes.
+        $currentParent = $this->plugin->getParent((int)$childId);
+        if ($currentParent && isset($currentParent['ticket_id'])
+            && (int)$currentParent['ticket_id'] !== $resolvedParentId
+        ) {
+            $oldParentAccess = $this->validateTicketAccess((int)$currentParent['ticket_id'], true);
+            if ($oldParentAccess !== true) {
+                subticket_log('Access denied to current parent', "parentId=" . $currentParent['ticket_id']);
+                return $oldParentAccess;
+            }
         }
 
         // 7. Execute linkTicket (existence, self-link, cycle and limit checks live there)
@@ -314,9 +330,10 @@ class SubticketController {
      * Returns parent status (is_parent, child_count) for multiple ticket IDs.
      * Used by queue-indicator.js to show parent icons in ticket lists.
      *
-     * The ids come from the queue the agent is looking at. The response
-     * carries no ticket content, only whether a ticket has children and how
-     * many, so it is rate limited rather than access filtered.
+     * The ids come from the queue the agent is looking at, but the endpoint
+     * accepts any id. Child counts are only reported for tickets the agent
+     * may view; every other id answers is_parent=false, the same as a ticket
+     * without children.
      *
      * @param string $ticketIds Comma-separated list of ticket IDs
      * @return array Success response with parent status data
@@ -341,26 +358,35 @@ class SubticketController {
             return $this->errorResponse('Too many ticket IDs (max 100)');
         }
 
-        // Build query to get child counts for all tickets in one query
-        $idsList = implode(',', $ids);
+        // Only tickets the agent may view get a real count
+        $visibleIds = array_values(array_filter($ids, function ($id) {
+            return $this->accessGuard->canView((int)$id);
+        }));
 
-        $sql = "SELECT
-                    parent.ticket_id,
-                    COUNT(child.ticket_id) as child_count
-                FROM " . Table::name('ticket') . " parent
-                LEFT JOIN " . Table::name('ticket') . " child ON parent.ticket_id = child.ticket_pid
-                WHERE parent.ticket_id IN ($idsList)
-                GROUP BY parent.ticket_id";
+        $data = [];
+        $result = null;
 
-        $result = db_query($sql);
+        if (!empty($visibleIds)) {
+            // Build query to get child counts for all tickets in one query
+            $idsList = implode(',', array_map('intval', $visibleIds));
 
-        if (!$result) {
-            return $this->errorResponse('Database query failed');
+            $sql = "SELECT
+                        parent.ticket_id,
+                        COUNT(child.ticket_id) as child_count
+                    FROM " . Table::name('ticket') . " parent
+                    LEFT JOIN " . Table::name('ticket') . " child ON parent.ticket_id = child.ticket_pid
+                    WHERE parent.ticket_id IN ($idsList)
+                    GROUP BY parent.ticket_id";
+
+            $result = db_query($sql);
+
+            if (!$result) {
+                return $this->errorResponse('Database query failed');
+            }
         }
 
         // Build result array
-        $data = [];
-        while ($row = db_fetch_array($result)) {
+        while ($result && ($row = db_fetch_array($result))) {
             $ticketId = (int)$row['ticket_id'];
             $childCount = (int)$row['child_count'];
 
