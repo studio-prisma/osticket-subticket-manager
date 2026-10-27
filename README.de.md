@@ -132,7 +132,7 @@ Issues, die nicht spezifisch für diesen Fork sind, gehören [Upstream](https://
 
 ## Lizenz
 
-[GNU General Public License v2.0](LICENSE), kompatibel mit dem osTicket-Core. Das Plugin stammt von [Markus Michalski](https://github.com/markus-michalski); dieser Fork wird von studio-prisma gepflegt.
+[GNU General Public License v2.0 oder später](LICENSE), kompatibel mit dem osTicket-Core. Das Plugin stammt von [Markus Michalski](https://github.com/markus-michalski); dieser Fork wird von studio-prisma gepflegt.
 
 ## Changelog
 

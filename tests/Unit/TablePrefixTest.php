@@ -81,6 +81,7 @@ $db->initialize();
 
 $GLOBALS['__test_csrf_token'] = 'tok';
 $GLOBALS['__test_staff_permission'] = true;
+$GLOBALS['__test_ticket_access'] = true; // batch status only counts visible tickets
 $controller = new SubticketController(new TestableSubticketPlugin());
 $controller->getBatchParentStatus('1,2');
 
